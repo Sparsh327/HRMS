@@ -77,7 +77,7 @@ class LargeChild extends StatelessWidget {
                   ),
                   RichText(
                     text: const TextSpan(
-                      text: "WellCome To ",
+                      text: "WelCome To ",
                       style: TextStyle(fontSize: 60, color: Color(0xFF8591B0)),
                       children: [
                         TextSpan(

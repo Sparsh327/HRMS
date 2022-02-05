@@ -24,18 +24,18 @@ mixin _$LoginStore on LoginStoreBase, Store {
     });
   }
 
-  final _$isOtpLoadingAtom = Atom(name: 'LoginStoreBase.isOtpLoading');
+  final _$showPasswordAtom = Atom(name: 'LoginStoreBase.showPassword');
 
   @override
-  bool get isOtpLoading {
-    _$isOtpLoadingAtom.reportRead();
-    return super.isOtpLoading;
+  bool get showPassword {
+    _$showPasswordAtom.reportRead();
+    return super.showPassword;
   }
 
   @override
-  set isOtpLoading(bool value) {
-    _$isOtpLoadingAtom.reportWrite(value, super.isOtpLoading, () {
-      super.isOtpLoading = value;
+  set showPassword(bool value) {
+    _$showPasswordAtom.reportWrite(value, super.showPassword, () {
+      super.showPassword = value;
     });
   }
 
@@ -48,14 +48,42 @@ mixin _$LoginStore on LoginStoreBase, Store {
         .run(() => super.isAlreadyAuthenticated(context));
   }
 
+  final _$registerWithEmailPassAsyncAction =
+      AsyncAction('LoginStoreBase.registerWithEmailPass');
+
+  @override
+  Future<void> registerWithEmailPass(
+      {required BuildContext context,
+      required String email,
+      required String pass,
+      required String name,
+      required String companyName}) {
+    return _$registerWithEmailPassAsyncAction.run(() => super
+        .registerWithEmailPass(
+            context: context,
+            email: email,
+            pass: pass,
+            name: name,
+            companyName: companyName));
+  }
+
+  final _$verifyEmailAsyncAction = AsyncAction('LoginStoreBase.verifyEmail');
+
+  @override
+  Future<void> verifyEmail(User user) {
+    return _$verifyEmailAsyncAction.run(() => super.verifyEmail(user));
+  }
+
   final _$signInWithEmailPassAsyncAction =
       AsyncAction('LoginStoreBase.signInWithEmailPass');
 
   @override
   Future<void> signInWithEmailPass(
-      BuildContext context, String email, String pass) {
-    return _$signInWithEmailPassAsyncAction
-        .run(() => super.signInWithEmailPass(context, email, pass));
+      {required BuildContext context,
+      required String email,
+      required String pass}) {
+    return _$signInWithEmailPassAsyncAction.run(() =>
+        super.signInWithEmailPass(context: context, email: email, pass: pass));
   }
 
   final _$signOutAsyncAction = AsyncAction('LoginStoreBase.signOut');
@@ -77,7 +105,7 @@ mixin _$LoginStore on LoginStoreBase, Store {
   String toString() {
     return '''
 isLoginLoading: ${isLoginLoading},
-isOtpLoading: ${isOtpLoading}
+showPassword: ${showPassword}
     ''';
   }
 }
