@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import 'core/db/db.dart';
 import 'features/auth/store/login_store.dart';
 import 'features/auth/ui/login_check.dart';
 
@@ -13,6 +14,7 @@ Future<void> main() async {
       statusBarColor: Colors.transparent,
     ),
   );
+  await db.init();
   await Firebase.initializeApp();
   runApp(const MyApp());
 }

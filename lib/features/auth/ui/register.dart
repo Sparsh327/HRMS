@@ -70,7 +70,7 @@ class _Body extends StatelessWidget {
                   const SizedBox(width: 15),
                   GestureDetector(
                     onTap: () {
-                      print(MediaQuery.of(context).size.width);
+                      // print(MediaQuery.of(context).size.width);
                     },
                     child: const Text(
                       "Login here!",
@@ -183,38 +183,40 @@ class _FormFields extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 30),
-        Observer(builder: (_) {
-          return TextField(
-            onChanged: (val) {
-              password = val;
-            },
-            obscureText: !loginStore.showPassword,
-            decoration: InputDecoration(
-              hintText: 'Password',
-              suffixIcon: IconButton(
-                icon: loginStore.showPassword
-                    ? const Icon(Icons.visibility_rounded)
-                    : const Icon(Icons.visibility_off_outlined),
-                color: Colors.grey,
-                onPressed: () {
-                  loginStore.showPassword = !loginStore.showPassword;
-                },
+        Observer(
+          builder: (_) {
+            return TextField(
+              onChanged: (val) {
+                password = val;
+              },
+              obscureText: !loginStore.showPassword,
+              decoration: InputDecoration(
+                hintText: 'Password',
+                suffixIcon: IconButton(
+                  icon: loginStore.showPassword
+                      ? const Icon(Icons.visibility_rounded)
+                      : const Icon(Icons.visibility_off_outlined),
+                  color: Colors.grey,
+                  onPressed: () {
+                    loginStore.showPassword = !loginStore.showPassword;
+                  },
+                ),
+                filled: true,
+                fillColor: Colors.blueGrey[50],
+                labelStyle: const TextStyle(fontSize: 12),
+                contentPadding: const EdgeInsets.only(left: 30),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blueGrey),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blueGrey),
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
-              filled: true,
-              fillColor: Colors.blueGrey[50],
-              labelStyle: const TextStyle(fontSize: 12),
-              contentPadding: const EdgeInsets.only(left: 30),
-              enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.blueGrey),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.blueGrey),
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
-          );
-        }),
+            );
+          },
+        ),
         const SizedBox(height: 40),
         Container(
           decoration: BoxDecoration(
@@ -236,11 +238,12 @@ class _FormFields extends StatelessWidget {
                   companyName.trim() != '') {
                 if (emailRegex.hasMatch(email)) {
                   loginStore.registerWithEmailPass(
-                      context: context,
-                      email: email,
-                      pass: password,
-                      name: name,
-                      companyName: companyName);
+                    context: context,
+                    email: email,
+                    pass: password,
+                    name: name,
+                    companyName: companyName,
+                  );
                 } else {
                   showToast("Please Enter Valid Email");
                 }

@@ -3,36 +3,69 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:side_navigation/side_navigation.dart';
 
-import '../../auth/store/login_store.dart';
-import '../store/dashboard_store.dart';
-import 'widgets/add_employee_page.dart';
+import '../../../core/db/db.dart';
+import '../../../core/db/model/employee_auth.dart';
+import '../../auth/ui/login_check.dart';
+import '../store/employee_dash_store.dart';
+import 'widgets/checkin.dart';
 
-class DashBoardScreen extends StatelessWidget {
-  const DashBoardScreen({Key? key}) : super(key: key);
-
+class EmpDashBoardScreen extends StatelessWidget {
+  const EmpDashBoardScreen({
+    required this.model,
+    Key? key,
+  }) : super(key: key);
+  final EmployeeAuthModel model;
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (_) => DashBoardStore()..init(),
+      create: (_) => EmployeeDashBoardStore(),
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Dashboard"),
           backgroundColor: Colors.indigo[900],
+          actions: [
+            InkWell(
+              onTap: () {
+                db.deleteEmployeeAuth();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CheckLogin()),
+                  (route) => false,
+                );
+              },
+              child: Row(
+                children: const [
+                  Text(
+                    "Logout",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      letterSpacing: 1,
+                      fontFamily: "Montserrat-Bold",
+                    ),
+                  ),
+                  Icon(
+                    Icons.login,
+                    size: 18,
+                    color: Colors.white,
+                  )
+                ],
+              ),
+            ),
+          ],
         ),
-        body: const DashBoardNavBar(),
+        body: const EmpDashBoardNavBar(),
       ),
     );
   }
 }
 
-class DashBoardNavBar extends StatelessWidget {
-  const DashBoardNavBar({Key? key}) : super(key: key);
+class EmpDashBoardNavBar extends StatelessWidget {
+  const EmpDashBoardNavBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final loginStore = Provider.of<LoginStore>(context);
-    final dashboardStore = Provider.of<DashBoardStore>(context);
-
+    final store = Provider.of<EmployeeDashBoardStore>(context);
     final List<Widget> views = [
       Center(
         child: Column(
@@ -40,7 +73,6 @@ class DashBoardNavBar extends StatelessWidget {
             const Text('Dashboard'),
             TextButton(
               onPressed: () {
-                loginStore.signOut(context);
                 // FirebaseFirestore.instance.collection("Leave").doc().set({"name":"cc",});
               },
               child: const Text("Logout"),
@@ -48,10 +80,11 @@ class DashBoardNavBar extends StatelessWidget {
           ],
         ),
       ),
-      const AddEmployeePage(),
+      // const AddEmployeePage(),
       const Center(
-        child: Text('Add Employee'),
+        child: Text('Task'),
       ),
+      const EmployeeCheckin()
     ];
     return Row(
       children: [
@@ -93,23 +126,23 @@ class DashBoardNavBar extends StatelessWidget {
                   ),
                 ),
               ),
-              selectedIndex: dashboardStore.index,
+              selectedIndex: store.index,
               items: const [
                 SideNavigationBarItem(
                   icon: Icons.dashboard,
-                  label: 'Dashboard',
+                  label: 'Task',
                 ),
                 SideNavigationBarItem(
-                  icon: Icons.person,
-                  label: 'Add Employee',
+                  icon: Icons.personal_injury_outlined,
+                  label: 'Apply Leave',
                 ),
                 SideNavigationBarItem(
-                  icon: Icons.settings,
-                  label: 'Settings',
+                  icon: Icons.calendar_today,
+                  label: 'Check In',
                 ),
               ],
               onTap: (index) {
-                dashboardStore.index = index;
+                store.index = index;
               },
             );
           },
@@ -119,7 +152,7 @@ class DashBoardNavBar extends StatelessWidget {
         Observer(
           builder: (_) {
             return Expanded(
-              child: views.elementAt(dashboardStore.index),
+              child: views.elementAt(store.index),
             );
           },
         )

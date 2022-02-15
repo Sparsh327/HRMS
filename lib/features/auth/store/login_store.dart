@@ -5,7 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../dashboard/ui/dashboard.dart';
-import '../../landing_page/landing_page.dart';
+import '../ui/login_check.dart';
 import 'repo/login_repo.dart';
 
 part 'login_store.g.dart';
@@ -208,7 +208,7 @@ abstract class LoginStoreBase extends ChangeNotifier with Store {
     await _auth.signOut();
     // ignore: use_build_context_synchronously
     await Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LandingPage()),
+      MaterialPageRoute(builder: (_) => const CheckLogin()),
       (route) => false,
     );
   }
@@ -243,5 +243,27 @@ abstract class LoginStoreBase extends ChangeNotifier with Store {
     }
 
     if (user != null) {}
+  }
+
+  @observable
+  bool employeLoading = false;
+  @action
+  Future<void> employeeLogin({
+    required String email,
+    required String password,
+  }) async {
+    employeLoading = true;
+
+    final val = (await FirebaseFirestore.instance
+            .collection("listOfEmployees")
+            .doc(password)
+            .get())
+        .exists;
+    if (val) {
+      await _loginRepo.authenticateEmployee(
+        id: password,
+      );
+    }
+    employeLoading = false;
   }
 }

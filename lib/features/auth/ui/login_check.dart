@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/db/db.dart';
 import '../../dashboard/ui/dashboard.dart';
+import '../../employee_dashboard/ui/employee_dashboard.dart';
 import '../../landing_page/landing_page.dart';
 import '../store/login_store.dart';
 
@@ -28,20 +30,35 @@ class _CheckLoginState extends State<CheckLogin> {
         );
       } else {
         // print("result is false");
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => const LandingPage(),
-          ),
-          (route) => false,
-        );
+        final employeeAuth = db.getEmployeeAuth();
+        if (employeeAuth != null) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (_) => EmpDashBoardScreen(
+                model: employeeAuth,
+              ),
+            ),
+            (route) => false,
+          );
+        } else {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => const LandingPage(),
+            ),
+            (route) => false,
+          );
+        }
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(),
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }

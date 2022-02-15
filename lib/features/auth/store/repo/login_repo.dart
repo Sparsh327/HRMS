@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../core/db/db.dart';
+import '../../../../core/db/model/employee_auth.dart';
 
 class LoginRepository {
   Future<void> uploadOneTimeLoginDetail({
@@ -13,5 +15,15 @@ class LoginRepository {
       "companyId": id,
       "nameOfCompany": nameOfCompany
     });
+  }
+
+  Future<void> authenticateEmployee({
+    required String id,
+  }) async {
+    final snap = await FirebaseFirestore.instance
+        .collection("listOfEmployees")
+        .doc(id)
+        .get();
+    await db.addEmployeeAuthDetails(EmployeeAuthModel.fromFirebase(snap));
   }
 }

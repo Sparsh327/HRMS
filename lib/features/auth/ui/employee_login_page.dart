@@ -3,6 +3,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/db/db.dart';
+import '../../employee_dashboard/ui/employee_dashBoard.dart';
 import '../store/login_store.dart';
 
 class EmployeeLogin extends StatelessWidget {
@@ -70,7 +72,7 @@ class _Body extends StatelessWidget {
                   const SizedBox(width: 15),
                   GestureDetector(
                     onTap: () {
-                      print(MediaQuery.of(context).size.width);
+                      // print(MediaQuery.of(context).size.width);
                     },
                     child: const Text(
                       "Login here!",
@@ -102,6 +104,7 @@ class _FormFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loginStore = Provider.of<LoginStore>(context);
+    // ignore: unused_local_variable
     final RegExp emailRegex = RegExp(
       r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
     );
@@ -141,66 +144,96 @@ class _FormFields extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 30),
-        Observer(builder: (_) {
-          return TextField(
-            onChanged: (val) {
-              password = val;
-            },
-            obscureText: !loginStore.showPassword,
-            decoration: InputDecoration(
-              hintText: 'Password',
-              suffixIcon: IconButton(
-                icon: loginStore.showPassword
-                    ? const Icon(Icons.visibility_rounded)
-                    : const Icon(Icons.visibility_off_outlined),
-                color: Colors.grey,
-                onPressed: () {
-                  loginStore.showPassword = !loginStore.showPassword;
-                },
+        Observer(
+          builder: (_) {
+            return TextField(
+              onChanged: (val) {
+                password = val;
+              },
+              obscureText: !loginStore.showPassword,
+              decoration: InputDecoration(
+                hintText: 'Password',
+                suffixIcon: IconButton(
+                  icon: loginStore.showPassword
+                      ? const Icon(Icons.visibility_rounded)
+                      : const Icon(Icons.visibility_off_outlined),
+                  color: Colors.grey,
+                  onPressed: () {
+                    loginStore.showPassword = !loginStore.showPassword;
+                  },
+                ),
+                filled: true,
+                fillColor: Colors.blueGrey[50],
+                labelStyle: const TextStyle(fontSize: 12),
+                contentPadding: const EdgeInsets.only(left: 30),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blueGrey),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blueGrey),
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
-              filled: true,
-              fillColor: Colors.blueGrey[50],
-              labelStyle: const TextStyle(fontSize: 12),
-              contentPadding: const EdgeInsets.only(left: 30),
-              enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.blueGrey),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.blueGrey),
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
-          );
-        }),
+            );
+          },
+        ),
         const SizedBox(height: 40),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.deepPurple,
-                spreadRadius: 2,
-                blurRadius: 20,
-              ),
-            ],
-          ),
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              primary: Colors.deepPurple,
-              onPrimary: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
-            child: const SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: Center(child: Text("Login")),
-            ),
-          ),
+        Observer(
+          builder: (_) {
+            if (loginStore.employeLoading) {
+              return const CircularProgressIndicator();
+            } else {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.deepPurple,
+                      spreadRadius: 2,
+                      blurRadius: 20,
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await loginStore.employeeLogin(
+                      email: email,
+                      password: password,
+                    );
+                    final auth = db.getEmployeeAuth();
+                    if (auth == null) {
+                      await showToast("Enter Valid Details");
+                    } else {
+                      // ignore: use_build_context_synchronously
+                      await Navigator.pushAndRemoveUntil(
+                        _,
+                        MaterialPageRoute(
+                          builder: (_) => EmpDashBoardScreen(
+                            model: auth,
+                          ),
+                        ),
+                        (route) => false,
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.deepPurple,
+                    onPrimary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: Center(child: Text("Login")),
+                  ),
+                ),
+              );
+            }
+          },
         ),
       ],
     );

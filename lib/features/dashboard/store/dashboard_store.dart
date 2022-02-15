@@ -1,15 +1,22 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:mobx/mobx.dart';
+
+import '../model/employee_model.dart';
+import '../repo/dashboard_repo.dart';
 
 part 'dashboard_store.g.dart';
 
 class DashBoardStore = _DashBoardStore with _$DashBoardStore;
 
-// final _dateGossipRepo = DateGossipRepo();
+final _dashBoardRepo = DashBoardRepo();
 
 abstract class _DashBoardStore with Store {
+  Future<void> init() async {
+    employeeList = ObservableStream(
+      _dashBoardRepo.fetchCompayEmployees(),
+      initialValue: [],
+    );
+  }
+
   @observable
   int index = 0;
 
@@ -25,28 +32,17 @@ abstract class _DashBoardStore with Store {
   DateTime? employeeJoiningDate;
   @observable
   bool updateEmployee = false;
+
   @action
   Future<void> addEmployee() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance.collection('listOfEmployees').add({
-      "employeeName": employeeName,
-      "employeeEmail": employeeEmail,
-      "employeeSalary": employeeSalary,
-      "employeeJoinDate": employeeJoiningDate,
-      "companyId": uid
-    }).then((value) {
-      FirebaseFirestore.instance
-          .collection('listOfCompanies')
-          .doc(uid)
-          .collection("companiesEmployee")
-          .doc(value.id)
-          .set({
-        "employeeName": employeeName,
-        "employeeEmail": employeeEmail,
-        "employeeSalary": employeeSalary,
-        "employeeJoinDate": employeeJoiningDate,
-        "companyId": uid
-      });
-    });
+    await _dashBoardRepo.addEmployeeToDb(
+      employeeDesignation: employeeDesignation,
+      employeeEmail: employeeEmail,
+      employeeName: employeeName,
+      employeeSalary: employeeSalary,
+      employeeJoiningDate: employeeJoiningDate!,
+    );
   }
+
+  late ObservableStream<List<EmployeeModel>> employeeList;
 }

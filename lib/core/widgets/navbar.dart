@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../features/auth/ui/employee_login_page.dart';
 import '../../features/auth/ui/owner_login_page.dart';
 import '../../features/auth/ui/register.dart';
 
@@ -37,7 +38,10 @@ class NavBar extends StatelessWidget {
           MaterialPageRoute(builder: (_) => const OwnerLoginPage()),
         );
       } else if (selected == 1) {
-        // await gossipStore.onRefresh();
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const EmployeeLogin()),
+        );
       }
       // await gossipStore.onRefresh();
     }

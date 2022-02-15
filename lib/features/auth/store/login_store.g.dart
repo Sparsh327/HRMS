@@ -39,6 +39,21 @@ mixin _$LoginStore on LoginStoreBase, Store {
     });
   }
 
+  final _$employeLoadingAtom = Atom(name: 'LoginStoreBase.employeLoading');
+
+  @override
+  bool get employeLoading {
+    _$employeLoadingAtom.reportRead();
+    return super.employeLoading;
+  }
+
+  @override
+  set employeLoading(bool value) {
+    _$employeLoadingAtom.reportWrite(value, super.employeLoading, () {
+      super.employeLoading = value;
+    });
+  }
+
   final _$isAlreadyAuthenticatedAsyncAction =
       AsyncAction('LoginStoreBase.isAlreadyAuthenticated');
 
@@ -101,11 +116,22 @@ mixin _$LoginStore on LoginStoreBase, Store {
     return _$signInWithGoogleAsyncAction.run(() => super.signInWithGoogle());
   }
 
+  final _$employeeLoginAsyncAction =
+      AsyncAction('LoginStoreBase.employeeLogin');
+
+  @override
+  Future<void> employeeLogin(
+      {required String email, required String password}) {
+    return _$employeeLoginAsyncAction
+        .run(() => super.employeeLogin(email: email, password: password));
+  }
+
   @override
   String toString() {
     return '''
 isLoginLoading: ${isLoginLoading},
-showPassword: ${showPassword}
+showPassword: ${showPassword},
+employeLoading: ${employeLoading}
     ''';
   }
 }

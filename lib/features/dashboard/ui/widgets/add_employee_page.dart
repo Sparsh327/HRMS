@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
+
 import '../../store/dashboard_store.dart';
+import 'employee_details_page.dart';
 
 class AddEmployeePage extends StatelessWidget {
   const AddEmployeePage({Key? key}) : super(key: key);
@@ -15,8 +14,34 @@ class AddEmployeePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
       // child:
-      child: Column(
+      child: ListView(
         children: [
+          Column(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  child: Row(
+                    children: const [
+                      SizedBox(width: 200, child: Text("Name")),
+                      SizedBox(width: 200, child: Text("Designation")),
+                      SizedBox(width: 200, child: Text("Email")),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const EmployeeList(),
+            ],
+          ),
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -33,6 +58,78 @@ class AddEmployeePage extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class EmployeeList extends StatelessWidget {
+  const EmployeeList({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final dashboardStore = Provider.of<DashBoardStore>(context);
+    return Observer(
+      builder: (_) {
+        final list = dashboardStore.employeeList.value;
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final model = list![index];
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EmployeeDetailsWidget(model: model),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[300],
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  child: Row(
+                    children: [
+                      SizedBox(width: 200, child: Text(model.employeeName)),
+                      SizedBox(
+                        width: 200,
+                        child: Text(model.employeeDesignation),
+                      ),
+                      SizedBox(width: 200, child: Text(model.employeeEmail)),
+                      SizedBox(
+                        width: 50,
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.edit),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 50,
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.delete),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          separatorBuilder: (context, index) {
+            return const SizedBox(
+              height: 10,
+            );
+          },
+          itemCount: list!.length,
+        );
+      },
     );
   }
 }
@@ -275,47 +372,10 @@ class AddEmployeeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dashboardStore = Provider.of<DashBoardStore>(context);
-    Future sendEmail({
-      required String email,
-      required String name,
-      required String subject,
-      required String message,
-    }) async {
-      final serviceId = 'service_vtd4gga';
-      final templateId = 'template_ylr68fm';
-      final userId = 'user_h7dWI3BCYwyo3cZEvCN95';
-      final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
-      final response = await http.post(
-        url,
-        headers: {
-          'origin': 'http://localhost',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'service_id': serviceId,
-          'template_id': templateId,
-          'user_id': userId,
-          'template_params': {
-            'to_email': email,
-            'user_name': name,
-            'user_subject': subject,
-            'user_message': message,
-          },
-        }),
-      );
-      print(response.body);
-    }
-
     return ElevatedButton(
       onPressed: () {
         dashboardStore.addEmployee();
         Navigator.pop(context);
-        // sendEmail(
-        //   email: "sparsh.jas07@gmail.com",
-        //   name: "ddd",
-        //   subject: "eede",
-        //   message: "dee",
-        // );
       },
       style: ElevatedButton.styleFrom(
         primary: Colors.deepPurple,
